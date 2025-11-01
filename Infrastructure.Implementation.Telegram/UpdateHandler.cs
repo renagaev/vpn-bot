@@ -18,13 +18,13 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<Telegra
         using var scope = scopeFactory.CreateScope();
         var sender = scope.ServiceProvider.GetRequiredService<ISender>();
         var settings = options.Value;
-        if (update is { Type: UpdateType.ChatMember, ChatMember.NewChatMember: { IsInChat: false, User: var lefMember } })
+        if (update is { Type: UpdateType.ChatMember, ChatMember.NewChatMember: { IsInChat: false, User: var lefMember }, } && update.ChatMember?.Chat.Id == settings.ChannelId)
         {
             await sender.Send(new UnsubscribeClientCommand(lefMember.Id), cancellationToken);
             return;
         }
         
-        if (update is { Type: UpdateType.ChatMember, ChatMember.NewChatMember: { IsInChat: true, User: var joinedMember } })
+        if (update is { Type: UpdateType.ChatMember, ChatMember.NewChatMember: { IsInChat: true, User: var joinedMember } } && update.ChatMember?.Chat.Id == settings.ChannelId)
         {
             await sender.Send(new SaveChannelSubscriberCommand(joinedMember.Id, joinedMember.Username, $"{joinedMember.FirstName} {joinedMember.LastName}"), cancellationToken);
             return;
