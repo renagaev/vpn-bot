@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS backend
 WORKDIR src
 
 COPY src/*.sln ./
-COPY src/**/*.csproj ./
+COPY ./**/*.csproj ./
 
 RUN for f in *.csproj; do \
         filename=$(basename $f) && \
@@ -13,7 +13,7 @@ RUN for f in *.csproj; do \
     done
 RUN dotnet restore VpnBot.API/VpnBot.API.csproj
 
-COPY src ./
+COPY ./ ./
 RUN dotnet publish VpnBot.API/VpnBot.API.csproj --output ./publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final 
