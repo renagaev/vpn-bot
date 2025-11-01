@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS backend
 
 WORKDIR src
 
-COPY src/*.sln ./
+COPY ./*.sln ./
 COPY ./**/*.csproj ./
 
 RUN for f in *.csproj; do \
