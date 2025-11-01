@@ -11,4 +11,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         return base.SaveChangesAsync(cancellationToken);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>();
+        
+        base.OnModelCreating(modelBuilder);
+    }
 }

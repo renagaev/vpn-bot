@@ -5,11 +5,9 @@ public class ClientSettings
     public string Id { get; init; }
     public string Flow { get; init; }
     public string Email { get; init; }
-    public string LimitIp { get; init; }
     public long ExpiryTime { get; init; }
     public long TotalGB { get; init; }
     public bool Enable { get; set; }
-    public string TgId { get; init; }
     public string SubId { get; init; }
     public string Comment { get; init; }
     public long Reset { get; init; }

@@ -1,6 +1,7 @@
 ﻿using Infrastructure.Interfaces.Telegram;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 
 namespace Infrastructure.Implementation.Telegram;
 
@@ -17,7 +18,7 @@ public class TelegramService(ITelegramBotClient botClient, IOptionsSnapshot<Tele
     {
         try
         {
-            await botClient.SendMessage(chatId, message, cancellationToken: cancellationToken);
+            await botClient.SendMessage(chatId, message, ParseMode.Markdown, cancellationToken: cancellationToken);
         }
         catch (Exception e)
         {

@@ -21,4 +21,10 @@
       <ProjectReference Include="..\UseCases\UseCases.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="..\Dockerfile">
+        <Link>Dockerfile</Link>
+      </Content>
+    </ItemGroup>
+
 </Project>

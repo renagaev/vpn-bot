@@ -15,10 +15,13 @@ public class UnsubscribeClientCommandHandler(
     public async Task Handle(UnsubscribeClientCommand request, CancellationToken cancellationToken)
     {
         var client = dbContext.Users.FirstOrDefault(x => x.Id == request.TgId);
-        if (client is not { IsSubscribed: true, PanelId: not null })
+        if (client == null)
         {
             return;
         }
+
+        client.IsSubscribed = false;
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var clientSettings = await xuiService.GetClient(client.PanelId, cancellationToken);
         if (clientSettings == null)
@@ -30,9 +33,7 @@ public class UnsubscribeClientCommandHandler(
         {
             clientSettings.Enable = false;
             await xuiService.UpdateClient(clientSettings, cancellationToken);
-            client.IsSubscribed = false;
-            await dbContext.SaveChangesAsync(cancellationToken);
-            await telegramService.SendMessage(client.ChatId, "До свидания :(", cancellationToken);
+            await telegramService.SendMessage(client.ChatId!.Value, "Пока :(", cancellationToken);
         }
     }
 }

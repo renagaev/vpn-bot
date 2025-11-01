@@ -6,6 +6,7 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using UseCases.Commands;
 
 namespace Infrastructure.Implementation.Telegram;
@@ -17,17 +18,31 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<Telegra
         using var scope = scopeFactory.CreateScope();
         var sender = scope.ServiceProvider.GetRequiredService<ISender>();
         var settings = options.Value;
-        if (update is { Type: UpdateType.ChatMember, ChatMember.NewChatMember: { IsInChat: false, User: var user } })
+        if (update is { Type: UpdateType.ChatMember, ChatMember.NewChatMember: { IsInChat: false, User: var lefMember } })
         {
-            await sender.Send(new UnsubscribeClientCommand(user.Id), cancellationToken);
+            await sender.Send(new UnsubscribeClientCommand(lefMember.Id), cancellationToken);
             return;
         }
         
-        var message = update.Message;
-        if (message is not { Chat.Id: var chatId, From.Id: var userId, Text: var text })
+        if (update is { Type: UpdateType.ChatMember, ChatMember.NewChatMember: { IsInChat: true, User: var joinedMember } })
         {
+            await sender.Send(new SaveChannelSubscriberCommand(joinedMember.Id, joinedMember.Username, $"{joinedMember.FirstName} {joinedMember.LastName}"), cancellationToken);
             return;
-        }   
+        }
+        
+        if (update.Message is { Type: MessageType.Text, From: var startUser, Text: "/start" })
+        {
+            await botClient.SendMessage(update.Message.Chat.Id, ";|",replyMarkup: new ReplyKeyboardMarkup(new KeyboardButton(settings.GetSubscriptionCommand)), cancellationToken: cancellationToken);
+            return;
+        }
+
+        if (update.Message is { Type: MessageType.Text, From: var user, Text: var text } && text == settings.GetSubscriptionCommand)
+        {
+            await sender.Send(new SubscribeClientCommand(update.Message.Chat.Id, user.Id,
+                $"{user.FirstName} {user.LastName}", user.Username), cancellationToken);
+            return;
+        }
+        
     }
 
 

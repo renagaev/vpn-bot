@@ -18,27 +18,16 @@ public class SubscribeClientCommandHandler(
 {
     public async Task Handle(SubscribeClientCommand request, CancellationToken cancellationToken)
     {
-        var isSubscriber = await telegramService.IsSubscriber(request.TgId, cancellationToken);
-        if (!isSubscriber)
+        var user = await GetUser(request, cancellationToken);
+        if (!user.IsSubscribed)
         {
-            await telegramService.SendMessage(request.ChatId, "Ты не подписчик", cancellationToken);
+            await telegramService.SendMessage(request.ChatId, "Не дам", cancellationToken);
             return;
         }
-
-        var inboundId = vpnSettings.Value.InboundId;
-
-        var user = await GetUser(request, cancellationToken);
-
         if (user.PanelId != null)
         {
-            var client = await xuiService.GetClient(user.PanelId, cancellationToken);
-            if (client != null)
-            {
-                client.Enable = true;
-                await xuiService.UpdateClient(client, cancellationToken);
-                await ReturnLink(request.ChatId, client.SubId, cancellationToken);
-                return;
-            }
+            await ReturnLink(request.ChatId, user.SubId!, cancellationToken);
+            return;
         }
 
         var panelId = Guid.NewGuid().ToString();
@@ -47,11 +36,11 @@ public class SubscribeClientCommandHandler(
         var settings = new ClientSettings
         {
             Id = panelId,
-            TgId = request.TgId.ToString(),
             Flow = vpnSettings.Value.Flow,
             Comment = $"{request.UserTitle} | @{request.Username}",
             Email = panelId,
-            SubId = subId
+            SubId = subId,
+            Enable = true
         };
 
         await xuiService.CreateClient(settings, cancellationToken);
@@ -64,22 +53,25 @@ public class SubscribeClientCommandHandler(
     private async Task ReturnLink(long chatId, string subId, CancellationToken cancellationToken)
     {
         var link = string.Format(vpnSettings.Value.SubLinkTemplate, subId);
-        await telegramService.SendMessage(chatId, $"Держи подписку: {link}", cancellationToken);
+        await telegramService.SendMessage(chatId, $"На: `{link}`\nСкачай приложение `Hiddify`, скопируй эту ссылку, нажми 'Новый профиль' и выбери 'Из буфера обмена'", cancellationToken);
     }
 
     private async Task<User> GetUser(SubscribeClientCommand request, CancellationToken cancellationToken)
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == request.TgId, cancellationToken);
         if (user != null) return user;
+        
+        var isSubscriber = await telegramService.IsSubscriber(request.TgId, cancellationToken);
         user = new User
         {
             Id = request.TgId,
             Username = request.Username,
             Title = request.UserTitle,
-            IsSubscribed = true,
+            IsSubscribed = isSubscriber,
             ChatId = request.ChatId
         };
         dbContext.Users.Add(user);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return user;
     }

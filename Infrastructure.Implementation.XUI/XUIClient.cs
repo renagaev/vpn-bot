@@ -7,7 +7,10 @@ namespace Infrastructure.Implementation.XUI;
 
 internal class XUIClient(HttpClient client, IOptionsSnapshot<XUISettings> options) : IXUIClient
 {
-    private static JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions();
+    private static JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     private async Task Login(CancellationToken cancellationToken)
     {
@@ -24,16 +27,18 @@ internal class XUIClient(HttpClient client, IOptionsSnapshot<XUISettings> option
     {
         await Login(cancellationToken);
 
+        var json = JsonSerializer.Serialize(new ClientCollection
+        {
+            Clients = [clientSettings]
+        }, JsonSerializerOptions);
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["id"] = inboundId.ToString(),
-            ["settings"] = JsonSerializer.Serialize(new ClientCollection
-            {
-                Clients = [clientSettings]
-            }, JsonSerializerOptions)
+            ["settings"] = json
         });
 
         var res = await client.PostAsync("panel/api/inbounds/addClient", content, cancellationToken);
+        var resContent = await res.Content.ReadAsStringAsync();
         res.EnsureSuccessStatusCode();
     }
 
@@ -50,14 +55,15 @@ internal class XUIClient(HttpClient client, IOptionsSnapshot<XUISettings> option
             }, JsonSerializerOptions)
         });
 
-        var res = await client.PostAsync($"/panel/api/inbounds/updateClient/{clientSettings.Id}", content, cancellationToken);
+        var res = await client.PostAsync($"panel/api/inbounds/updateClient/{clientSettings.Id}", content, cancellationToken);
+        var resContent = await res.Content.ReadAsStringAsync();
         res.EnsureSuccessStatusCode();
     }
 
     public async Task<ICollection<ClientSettings>> GetInboundClients(long inboundId, CancellationToken cancellationToken)
     {
         await Login(cancellationToken);
-        var res = await client.GetAsync("/panel/api/inbounds/get/1", cancellationToken);
+        var res = await client.GetAsync($"panel/api/inbounds/get/{inboundId}", cancellationToken);
         res.EnsureSuccessStatusCode();
         var resObj = await res.Content.ReadFromJsonAsync<GetInboundResponse>(JsonSerializerOptions, cancellationToken: cancellationToken);
         var clients = JsonSerializer.Deserialize<ClientCollection>(resObj.Obj.Settings, JsonSerializerOptions);
