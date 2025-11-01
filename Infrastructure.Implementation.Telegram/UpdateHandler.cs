@@ -29,12 +29,6 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<Telegra
             await sender.Send(new SaveChannelSubscriberCommand(joinedMember.Id, joinedMember.Username, $"{joinedMember.FirstName} {joinedMember.LastName}"), cancellationToken);
             return;
         }
-        
-        if (update.Message is { Type: MessageType.Text, From: var startUser, Text: "/start" })
-        {
-            await botClient.SendMessage(update.Message.Chat.Id, ";|",replyMarkup: new ReplyKeyboardMarkup(new KeyboardButton(settings.GetSubscriptionCommand)), cancellationToken: cancellationToken);
-            return;
-        }
 
         if (update.Message is { Type: MessageType.Text, From: var user, Text: var text } && text == settings.GetSubscriptionCommand)
         {
@@ -43,6 +37,11 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<Telegra
             return;
         }
         
+        if (update.Message != null)
+        {
+            await botClient.SendMessage(update.Message.Chat.Id, ";|",replyMarkup: new ReplyKeyboardMarkup(new KeyboardButton(settings.GetSubscriptionCommand)), cancellationToken: cancellationToken);
+            return;
+        }
     }
 
 
