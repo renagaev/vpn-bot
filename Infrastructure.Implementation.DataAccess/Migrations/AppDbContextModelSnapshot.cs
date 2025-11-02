@@ -52,7 +52,6 @@ namespace Infrastructure.Implementation.DataAccess.Migrations
                         .HasColumnName("title");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("username");
 

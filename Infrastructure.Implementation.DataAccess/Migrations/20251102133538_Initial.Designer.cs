@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Implementation.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251101191739_Initial")]
+    [Migration("20251102133538_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -55,7 +55,6 @@ namespace Infrastructure.Implementation.DataAccess.Migrations
                         .HasColumnName("title");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("username");
 

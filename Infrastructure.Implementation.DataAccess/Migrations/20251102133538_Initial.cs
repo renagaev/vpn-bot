@@ -18,7 +18,7 @@ namespace Infrastructure.Implementation.DataAccess.Migrations
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     chat_id = table.Column<long>(type: "bigint", nullable: true),
-                    username = table.Column<string>(type: "text", nullable: false),
+                    username = table.Column<string>(type: "text", nullable: true),
                     title = table.Column<string>(type: "text", nullable: false),
                     is_subscribed = table.Column<bool>(type: "boolean", nullable: false),
                     panel_id = table.Column<string>(type: "text", nullable: true),
