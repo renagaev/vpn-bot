@@ -59,7 +59,12 @@ public class SubscribeClientCommandHandler(
     private async Task<User> GetUser(SubscribeClientCommand request, CancellationToken cancellationToken)
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == request.TgId, cancellationToken);
-        if (user != null) return user;
+        if (user != null)
+        {
+            user.ChatId = request.ChatId;
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return user;
+        }
         
         var isSubscriber = await telegramService.IsSubscriber(request.TgId, cancellationToken);
         user = new User
