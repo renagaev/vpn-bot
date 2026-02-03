@@ -21,7 +21,7 @@ public class SubscribeClientCommandHandler(
         var user = await GetUser(request, cancellationToken);
         if (!user.IsSubscribed)
         {
-            await telegramService.SendMessage(request.ChatId, "Не дам", cancellationToken);
+            await telegramService.SendMessage(request.ChatId, "Не дам, ты не подписчик :|", cancellationToken);
             return;
         }
         if (user.PanelId != null)
@@ -53,7 +53,8 @@ public class SubscribeClientCommandHandler(
     private async Task ReturnLink(long chatId, string subId, CancellationToken cancellationToken)
     {
         var link = string.Format(vpnSettings.Value.SubLinkTemplate, subId);
-        await telegramService.SendMessage(chatId, $"На: `{link}`\nСкачай приложение `Hiddify`, скопируй эту ссылку, нажми 'Новый профиль' и выбери 'Из буфера обмена'", cancellationToken);
+        await telegramService.SendMessage(chatId, "Скачай приложение `Hiddify` или Streisand(iOS), скопируй эту ссылку, нажми 'Новый профиль' и выбери 'Из буфера обмена'", cancellationToken);
+        await telegramService.SendMessage(chatId, $"`{link}`", cancellationToken);
     }
 
     private async Task<User> GetUser(SubscribeClientCommand request, CancellationToken cancellationToken)
