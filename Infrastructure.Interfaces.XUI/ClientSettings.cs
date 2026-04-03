@@ -1,6 +1,6 @@
 namespace Infrastructure.Interfaces.XUI;
 
-public class ClientSettings
+public record ClientSettings
 {
     public string Id { get; init; }
     public string Flow { get; init; }
