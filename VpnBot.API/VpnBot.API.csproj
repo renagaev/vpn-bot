@@ -13,9 +13,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Infrastructure.Implementation.DataAccess\Infrastructure.Implementation.DataAccess.csproj" />
+      <ProjectReference Include="..\Infrastructure.Implementation.HappSpoofer\Infrastructure.Implementation.HappSpoofer.csproj" />
       <ProjectReference Include="..\Infrastructure.Implementation.Telegram\Infrastructure.Implementation.Telegram.csproj" />
       <ProjectReference Include="..\Infrastructure.Implementation.XUI\Infrastructure.Implementation.XUI.csproj" />
       <ProjectReference Include="..\Infrastructure.Interfaces.DataAccess\Infrastructure.Interfaces.DataAccess.csproj" />
+      <ProjectReference Include="..\Infrastructure.Interfaces.HappSpoofer\Infrastructure.Interfaces.HappSpoofer.csproj" />
       <ProjectReference Include="..\Infrastructure.Interfaces.Telegram\Infrastructure.Interfaces.Telegram.csproj" />
       <ProjectReference Include="..\Infrastructure.Interfaces.XUI\Infrastructure.Interfaces.XUI.csproj" />
       <ProjectReference Include="..\UseCases\UseCases.csproj" />

@@ -1,7 +1,6 @@
 using Domain;
 using Infrastructure.Interfaces.DataAccess;
 using Infrastructure.Interfaces.Telegram;
-using Infrastructure.Interfaces.XUI;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -12,7 +11,6 @@ public record SubscribeClientCommand(long ChatId, long TgId, string UserTitle, s
 
 public class SubscribeClientCommandHandler(
     IDbContext dbContext,
-    XUIService xuiService,
     ITelegramService telegramService,
     IOptionsSnapshot<VpnSettings> vpnSettings) : IRequestHandler<SubscribeClientCommand>
 {
@@ -32,18 +30,6 @@ public class SubscribeClientCommandHandler(
 
         var panelId = Guid.NewGuid().ToString();
         var subId = Guid.NewGuid().ToString();
-
-        var settings = new ClientSettings
-        {
-            Id = panelId,
-            Flow = vpnSettings.Value.Flow,
-            Comment = $"{request.UserTitle} | @{request.Username}",
-            Email = panelId,
-            SubId = subId,
-            Enable = true
-        };
-
-        await xuiService.CreateClient(settings, cancellationToken);
         user.PanelId = panelId;
         user.SubId = subId;
         await dbContext.SaveChangesAsync(cancellationToken);

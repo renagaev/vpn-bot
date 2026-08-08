@@ -15,7 +15,12 @@ public class XUIService(IXUIClient xuiClient, IOptionsSnapshot<VpnSettings> vpnS
     {
         foreach (var inboundId in vpnSettings.Value.InboundIds)
         {
-            await xuiClient.UpdateClient(inboundId, clientSettings, cancellationToken);
+            var clients = await xuiClient.GetInboundClients(inboundId, cancellationToken);
+            var client = clients.FirstOrDefault(x => x.Id == clientSettings.Id);
+            if (client == null)
+                return;
+            client.Enable = clientSettings.Enable;
+            await xuiClient.UpdateClient(inboundId, client, cancellationToken);
         }
     }
 
@@ -23,7 +28,8 @@ public class XUIService(IXUIClient xuiClient, IOptionsSnapshot<VpnSettings> vpnS
     {
         foreach (var inboundId in vpnSettings.Value.InboundIds)
         {
-            await xuiClient.CreateClient(inboundId, clientSettings, cancellationToken);
+            var settings = clientSettings with { Email = Guid.NewGuid().ToString() };
+            await xuiClient.CreateClient(inboundId, settings, cancellationToken);
         }
     }
 }

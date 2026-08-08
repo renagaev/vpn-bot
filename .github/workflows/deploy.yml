@@ -48,5 +48,6 @@ jobs:
               --env XUISettings__Password="${{ secrets.XUI_PASSWORD }}" \
               --env VpnSettings__InboundId="${{ secrets.XUI_INBOUND_ID }}" \
               --env VpnSettings__SubLinkTemplate="${{ secrets.XUI_SUBLINK_TEMPLATE }}" \
+              --env SubscriptionSettings__Url="${{ secrets.VPN_SUB_LINK_1 }}" 
               --restart unless-stopped \
             -p ${{ secrets.APP_PORT }}:80 ${{ env.image_tag }} 
