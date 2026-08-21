@@ -23,7 +23,6 @@ public class GetSubJsonQueryHandler(
 {
     public async Task<Subscription?> Handle(GetSubJsonQuery request, CancellationToken cancellationToken)
     {
-        return BuildDirectOnlySubscription(request.UserAgent);
         var user = await context.Users.FirstOrDefaultAsync(x => x.SubId == request.Id, cancellationToken);
         if (user != null)
             await TrackAccessAsync(user.Id, request.UserAgent, request.Hwid, cancellationToken);
