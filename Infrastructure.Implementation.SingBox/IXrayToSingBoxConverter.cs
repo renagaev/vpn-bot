@@ -1,6 +1,3 @@
-using Infrastructure.Implementation.SingBox.SingBoxModels;
-using Infrastructure.Implementation.SingBox.XrayModels;
-
 namespace Infrastructure.Implementation.SingBox;
 
 public interface IXrayToSingBoxConverter
@@ -18,6 +15,4 @@ public interface IXrayToSingBoxConverter
     /// <param name="xrayJsonArray">JSON массив xray конфигураций</param>
     /// <returns>JSON строка singbox конфигурации</returns>
     string ConvertJsonArray(string xrayJsonArray);
-    
-    string BuildDirectOnlyJson();
 }
