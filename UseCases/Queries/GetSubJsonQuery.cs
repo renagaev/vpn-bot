@@ -82,8 +82,15 @@ public class GetSubJsonQueryHandler(
         return new Subscription(json, Constants.DirectName, options.Value.UpdateIntervalHours);
     }
 
-    private string ConvertIfNeeded(string xrayJson, string? userAgent) =>
-        IsHiddify(userAgent) ? converter.ConvertJson(xrayJson) : xrayJson;
+    private string ConvertIfNeeded(string xrayJson, string? userAgent)
+    {
+        if (IsHiddify(userAgent))
+        {
+            return xrayJson.StartsWith("[") ? converter.ConvertJsonArray(xrayJson) : converter.ConvertJson(xrayJson);
+        }
+
+        return xrayJson;
+    }
 
     private static bool IsHiddify(string? userAgent) =>
         !string.IsNullOrEmpty(userAgent) && userAgent.Contains("Hiddify", StringComparison.OrdinalIgnoreCase);
