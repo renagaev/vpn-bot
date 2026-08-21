@@ -39,7 +39,7 @@ public class SubscribeClientCommandHandler(
     private async Task ReturnLink(long chatId, string subId, CancellationToken cancellationToken)
     {
         var link = string.Format(vpnSettings.Value.SubLinkTemplate, subId);
-        await telegramService.SendMessage(chatId, "Скачай приложение `Hiddify` или Streisand(iOS), скопируй эту ссылку, нажми 'Новый профиль' и выбери 'Из буфера обмена'", cancellationToken);
+        await telegramService.SendMessage(chatId, "Скачай приложение Hiddify/Happ/v2raytun или Streisand(iOS), скопируй эту ссылку, нажми 'Новый профиль' и выбери 'Из буфера обмена'", cancellationToken);
         await telegramService.SendMessage(chatId, $"`{link}`", cancellationToken);
     }
 
