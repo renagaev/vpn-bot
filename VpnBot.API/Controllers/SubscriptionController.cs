@@ -13,11 +13,12 @@ public class SubscriptionController(ISender sender) : ControllerBase
     [Route("{id}")]
     public async Task<IActionResult> GetSubscriptionJson(string id, CancellationToken cancellationToken)
     {
-        var subscription = await sender.Send(new GetSubJsonQuery(id), cancellationToken);
-        if (subscription == null)
-            return NotFound();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var subscription = await sender.Send(new GetSubJsonQuery(id, userAgent), cancellationToken);
 
-        Response.Headers.Add("Profile-Title", "base64:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(subscription.Title)));
+        var titleBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(subscription.Title));
+        // Response.Headers.Add("Profile-Title", "base64:" + titleBase64);
+        Response.Headers.Add("profile-title", "base64:" + titleBase64);
         Response.Headers.Add("Profile-Update-Interval", subscription.UpdateInterval.ToString());
         return new ContentResult
         {

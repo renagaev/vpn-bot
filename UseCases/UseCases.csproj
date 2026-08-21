@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Infrastructure.Implementation.SingBox\Infrastructure.Implementation.SingBox.csproj" />
       <ProjectReference Include="..\Infrastructure.Interfaces.DataAccess\Infrastructure.Interfaces.DataAccess.csproj" />
       <ProjectReference Include="..\Infrastructure.Interfaces.HappSpoofer\Infrastructure.Interfaces.HappSpoofer.csproj" />
       <ProjectReference Include="..\Infrastructure.Interfaces.Telegram\Infrastructure.Interfaces.Telegram.csproj" />
