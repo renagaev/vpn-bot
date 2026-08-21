@@ -10,7 +10,7 @@ public static class DependencyInjection
     public static IServiceCollection AddTelegramServices(this IServiceCollection services)
     {
         services.AddScoped<ITelegramService, TelegramService>();
-        services.AddHostedService<TelegramHostedService>();
+        // services.AddHostedService<TelegramHostedService>();
         services.AddSingleton<UpdateHandler>();
         
         services.AddSingleton<ITelegramBotClient, TelegramBotClient>(serviceProvider =>
