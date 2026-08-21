@@ -17,7 +17,7 @@ public static class DependencyInjection
 
         services.AddDbContext<IDbContext, AppDbContext>((provider, options) =>
         {
-            options.UseNpgsql(datasource)
+            options.UseNpgsql(datasource, o => o.MigrationsHistoryTable("__EFMigrationsHistory", "public"))
                 .UseSnakeCaseNamingConvention();
         });
 
