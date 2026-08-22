@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Domain;
 using Infrastructure.Implementation.SingBox;
 using Infrastructure.Interfaces.DataAccess;
@@ -30,16 +31,39 @@ public class GetSubJsonQueryHandler(
         if (user is not { IsSubscribed: true })
             return BuildDirectOnlySubscription(request.UserAgent);
 
-        if (cache.Get(options.Value.CacheKey) is string cached)
-            return BuildSubscription(cached, request.UserAgent);
+        var responses = await Task.WhenAll(
+            options.Value.Urls.Select(url => GetCachedSubscriptionJsonAsync(url, cancellationToken)));
 
-        var value = await spoofer.GetSubscriptionJson(options.Value.Url, cancellationToken);
-        cache.Set(options.Value.CacheKey, value, new MemoryCacheEntryOptions
+        return BuildSubscription(MergeSubscriptionResponses(responses), request.UserAgent);
+    }
+
+    private async Task<string> GetCachedSubscriptionJsonAsync(string url, CancellationToken cancellationToken)
+    {
+        if (cache.Get(url) is string cached)
+            return cached;
+
+        var value = await spoofer.GetSubscriptionJson(url, cancellationToken);
+        cache.Set(url, value, new MemoryCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = options.Value.CacheDuration
         });
 
-        return BuildSubscription(value, request.UserAgent);
+        return value;
+    }
+
+    private static string MergeSubscriptionResponses(IEnumerable<string> rawResponses)
+    {
+        var merged = new List<JsonElement>();
+        foreach (var raw in rawResponses)
+        {
+            using var doc = JsonDocument.Parse(raw);
+            if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                merged.AddRange(doc.RootElement.EnumerateArray().Select(e => e.Clone()));
+            else
+                merged.Add(doc.RootElement.Clone());
+        }
+
+        return JsonSerializer.Serialize(merged);
     }
 
     private async Task TrackAccessAsync(long userId, string? userAgent, string? hwid,
